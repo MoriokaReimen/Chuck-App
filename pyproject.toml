@@ -4,10 +4,16 @@ version = "0.1.0"
 description = ""
 authors = ["MoriokaReimen <kei.nakata.job@gmail.com>"]
 readme = "README.md"
-packages = [{include = "chuck_norris", from = "src"}]
+packages = [
+    {include = "app", from = "src"},
+    {include = "core", from = "src"},
+    {include = "driver", from = "src"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+pyqt6 = "^6.7.1"
+qt-material = "^2.14"
 
 [tool.poetry.group.tool.dependencies]
 pytest = "^8.3.3"
@@ -19,3 +25,48 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 pythonpath = "project"
+
+[tool.poetry.scripts]
+app = "app.main:main"
+
+[tool.mypy]
+show_error_context = true
+show_column_numbers = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_return_any = true
+check_untyped_defs = true
+
+[tool.ruff]
+exclude = [
+    ".venv",
+    "venv",
+    "__pycache__",
+    ".git",
+    "dist",
+    "build",
+]
+
+line-length = 88
+indent-width = 4
+
+[tool.ruff.lint]
+# PEP8のどのルールを対象に警告を出すか
+select = [
+    "C",
+    "E",
+    "F",
+    "W",
+]
+ignore = [
+]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint.mccabe]
+# if,forなどの複雑性をどれくらい許容するか。if,for文が11以上あると警告
+# C901
+max-complexity = 10

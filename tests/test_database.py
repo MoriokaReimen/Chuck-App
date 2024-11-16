@@ -1,11 +1,12 @@
-from chuck_norris import database
+# -*- coding: utf-8 -*-
+from driver import DataBase
 
 def test_database():
-    entry = database.Entry('hogehoge')
+    entry = DataBase.Entry('hogehoge')
     entry.attachments = ['fuga', 'buzz']
-    entry2 = database.Entry('fugafuga')
+    entry2 = DataBase.Entry('fugafuga')
     entry2.attachments = ['fuga2', 'buzz2']
-    db = database.DataBase()
+    db = DataBase.DataBase()
     db.add(entry)
     db.add(entry2)
     db.add(entry)

@@ -10,7 +10,7 @@ class Entry:
     def __init__(self, contents :str, id :int = 0):
         self.id = id
         self.contents = contents
-        self.attachments = list()
+        self.attachments = []
 
 def factory(cursor, row):
     d = {}
@@ -58,10 +58,10 @@ class DataBase:
             ''', {'mail_id' : mail_id, 'attachment': attachment})
 
     def query(self, key : str, value : str):
-        sql = f'SELECT * FROM mail WHERE {key} LIKE \'%{value}%\';' 
+        sql = f'SELECT * FROM mail WHERE {key} LIKE \'%{value}%\';'
         mails = self._cur.execute(sql).fetchall()
 
-        ret = list()
+        ret = []
         for mail in mails:
             entry = Entry(**mail)
             entry.attachments = self._get_attachments(entry.id)
@@ -69,10 +69,10 @@ class DataBase:
         return ret
 
     def get_all(self) -> list[Entry]:
-        sql = 'SELECT * FROM mail;' 
+        sql = 'SELECT * FROM mail;'
         mails = self._cur.execute(sql).fetchall()
 
-        ret = list()
+        ret = []
         for mail in mails:
             entry = Entry(**mail)
             entry.attachments = self._get_attachments(entry.id)
@@ -80,9 +80,9 @@ class DataBase:
         return ret
 
     def _get_attachments(self, id : int) -> list[str]:
-        sql = f'SELECT * FROM attachment WHERE mail_id ={id};' 
+        sql = f'SELECT * FROM attachment WHERE mail_id ={id};'
         attachments = self._cur.execute(sql).fetchall()
-        ret = list()
+        ret = []
         for attachment in attachments:
             print(attachment)
             ret.append(attachment['attachment'])
