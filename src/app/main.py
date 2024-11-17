@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from app.StartStopUI import StartStopUI
+from app.ConsoleUI import ConsoleUI
 from PyQt6.QtWidgets import (
     QGridLayout,
     QWidget,
@@ -21,9 +22,13 @@ class MainWindow(QMainWindow):
         self.widget = QWidget()
         self.widget.setLayout(pagelayout)
 
+        # Configure Console UI
+        self.console_ui = ConsoleUI()
+        pagelayout.addWidget(self.console_ui, 0, 0)
+
         # Configure StartStop UI
         self.start_stop_ui = StartStopUI()
-        pagelayout.addWidget(self.start_stop_ui, 0, 0)
+        pagelayout.addWidget(self.start_stop_ui, 1, 0)
 
         # tie whole widgets to Window
         self.setCentralWidget(self.widget)
