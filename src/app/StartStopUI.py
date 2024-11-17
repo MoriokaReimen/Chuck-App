@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
 )
 from app.QLed import QLed
 from core import Core
+from typing import override
 from PyQt6.QtCore import pyqtSignal
 
 class StartStopUI(QWidget):
@@ -62,6 +63,7 @@ class StartStopUI(QWidget):
     def blink_indicator(self):
         self._led.toggleValue()
 
+    @override
     def update(self, message : str) -> None:
         if "Heart Beat : " in message:
             self.signal_indicator.emit()

@@ -42,9 +42,11 @@ class TableUI(QWidget, Observer):
         # Table
         self.table = QTableWidget(self)
         self.table.setRowCount(0)
-        self.table.setColumnCount(2)
+        self.table.setColumnCount(4)
         self.table.setHorizontalHeaderItem(0, QTableWidgetItem('Title'))
         self.table.setHorizontalHeaderItem(1, QTableWidgetItem('Contents'))
+        self.table.setHorizontalHeaderItem(2, QTableWidgetItem('Sender'))
+        self.table.setHorizontalHeaderItem(3, QTableWidgetItem('Receiver'))
         self.table.horizontalHeader().setStretchLastSection(True)
         grouplayout.addWidget(self.table)
 
@@ -59,9 +61,27 @@ class TableUI(QWidget, Observer):
         entries = self._core.database.get_all()
         for index, entry in enumerate(entries):
             self.table.insertRow(self.table.rowCount())
+
+            # Title
+            item = QTableWidgetItem(entry.title[0:20])
+            item.setFlags(item.flags() ^ Qt.ItemFlag.ItemIsEditable)
+            self.table.setItem(self.table.rowCount()-1, 0, item)
+
+            # Contents
             item = QTableWidgetItem(entry.contents[0:20])
             item.setFlags(item.flags() ^ Qt.ItemFlag.ItemIsEditable)
             self.table.setItem(self.table.rowCount()-1, 1, item)
+
+            # Sender
+            item = QTableWidgetItem(entry.sender[0:20])
+            item.setFlags(item.flags() ^ Qt.ItemFlag.ItemIsEditable)
+            self.table.setItem(self.table.rowCount()-1, 2, item)
+
+            # Receiver
+            item = QTableWidgetItem(entry.receiver[0:20])
+            item.setFlags(item.flags() ^ Qt.ItemFlag.ItemIsEditable)
+            self.table.setItem(self.table.rowCount()-1, 3, item)
+
             item = QTableWidgetItem(str(index))
             self.table.setVerticalHeaderItem(self.table.rowCount()-1, item)
 

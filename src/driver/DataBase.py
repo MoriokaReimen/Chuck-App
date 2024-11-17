@@ -6,10 +6,16 @@ import hashlib
 class Entry:
     contents : str = ''
     attachments : list[str] = field(default_factory = list)
+    title : str = ''
+    sender : str = ''
+    receiver : str = ''
 
     def hash(self) -> str:
         hasher = hashlib.sha256()
         hasher.update(self.contents.encode())
+        hasher.update(self.title.encode())
+        hasher.update(self.sender.encode())
+        hasher.update(self.receiver.encode())
         return hasher.hexdigest()
 
 def factory(cursor, row):
@@ -28,6 +34,9 @@ class DataBase:
                 CREATE TABLE IF NOT EXISTS mail(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 hash TEXT NOT NULL UNIQUE,
+                title TEXT NOT NULL,
+                sender TEXT NOT NULL,
+                receiver TEXT NOT NULL,
                 contents TEXT NOT NULL)
             ''')
         self._cur.execute(
@@ -53,10 +62,15 @@ class DataBase:
         # If value is not exists in table add entry
         self._cur.execute(
         '''
-            INSERT INTO mail(hash, contents)
-            VALUES (:hash, :contents)
+            INSERT INTO mail(hash, title, contents, sender, receiver)
+            VALUES (:hash, :title, :contents, :sender, :receiver)
             RETURNING id
-        ''', {'hash' : hash, 'contents' : entry.contents})
+        ''', {'hash' : hash,
+              'contents' : entry.contents,
+              'title' : entry.title,
+              'sender' : entry.sender,
+              'receiver' : entry.receiver,
+             })
         mail_id = self._cur.fetchone()['id']
 
         for attachment in entry.attachments:
@@ -75,6 +89,9 @@ class DataBase:
         for mail in mails:
             entry = Entry()
             entry.contents = mail['contents']
+            entry.title = mail['title']
+            entry.sender = mail['sender']
+            entry.receiver = mail['receiver']
             entry.attachments = self._get_attachments(mail['id'])
             ret.append(entry)
         return ret
@@ -87,6 +104,9 @@ class DataBase:
         for mail in mails:
             entry = Entry()
             entry.contents = mail['contents']
+            entry.title = mail['title']
+            entry.sender = mail['sender']
+            entry.receiver = mail['receiver']
             entry.attachments = self._get_attachments(mail['id'])
             ret.append(entry)
         return ret
