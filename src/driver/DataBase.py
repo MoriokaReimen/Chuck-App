@@ -1,16 +1,16 @@
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import hashlib
 
-@dataclass(init=False)
+@dataclass
 class Entry:
-    contents : str
-    attachments : list[str]
-    id : int = 0
+    contents : str = ''
+    attachments : list[str] = field(default_factory = list)
 
-    def __init__(self, contents :str, id :int = 0):
-        self.id = id
-        self.contents = contents
-        self.attachments = []
+    def hash(self) -> str:
+        hasher = hashlib.sha256()
+        hasher.update(self.contents.encode())
+        return hasher.hexdigest()
 
 def factory(cursor, row):
     d = {}
@@ -27,6 +27,7 @@ class DataBase:
             '''
                 CREATE TABLE IF NOT EXISTS mail(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                hash TEXT NOT NULL UNIQUE,
                 contents TEXT NOT NULL)
             ''')
         self._cur.execute(
@@ -42,12 +43,20 @@ class DataBase:
         self._data_base.commit()
 
     def add(self, entry : Entry) -> bool:
+        hash = entry.hash()
+
+        # Check value is exists?
+        found = self.query(key = 'hash', value = hash)
+        if found :
+            return False
+
+        # If value is not exists in table add entry
         self._cur.execute(
         '''
-            INSERT INTO mail(contents)
-            VALUES (:contents)
+            INSERT INTO mail(hash, contents)
+            VALUES (:hash, :contents)
             RETURNING id
-        ''', {'contents' : entry.contents})
+        ''', {'hash' : hash, 'contents' : entry.contents})
         mail_id = self._cur.fetchone()['id']
 
         for attachment in entry.attachments:
@@ -56,6 +65,7 @@ class DataBase:
                 INSERT INTO attachment(mail_id, attachment)
                 VALUES (:mail_id, :attachment)
             ''', {'mail_id' : mail_id, 'attachment': attachment})
+        return True
 
     def query(self, key : str, value : str):
         sql = f'SELECT * FROM mail WHERE {key} LIKE \'%{value}%\';'
@@ -63,8 +73,9 @@ class DataBase:
 
         ret = []
         for mail in mails:
-            entry = Entry(**mail)
-            entry.attachments = self._get_attachments(entry.id)
+            entry = Entry()
+            entry.contents = mail['contents']
+            entry.attachments = self._get_attachments(mail['id'])
             ret.append(entry)
         return ret
 
@@ -74,8 +85,9 @@ class DataBase:
 
         ret = []
         for mail in mails:
-            entry = Entry(**mail)
-            entry.attachments = self._get_attachments(entry.id)
+            entry = Entry()
+            entry.contents = mail['contents']
+            entry.attachments = self._get_attachments(mail['id'])
             ret.append(entry)
         return ret
 
@@ -84,7 +96,6 @@ class DataBase:
         attachments = self._cur.execute(sql).fetchall()
         ret = []
         for attachment in attachments:
-            print(attachment)
             ret.append(attachment['attachment'])
         return ret
 
