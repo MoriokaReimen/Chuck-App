@@ -3,10 +3,12 @@ from core.Observer import Subject
 from threading import Thread, Event
 from datetime import datetime
 from time import sleep
+from driver.DataBase import DataBase
 
 class Core(Subject):
     def __init__(self) -> None:
         super().__init__()
+        self.database = DataBase()
         self._stop_event = Event()
         self._thread = None
 

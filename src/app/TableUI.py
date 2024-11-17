@@ -7,7 +7,9 @@ from PyQt6.QtWidgets import (
     QTableWidget,
     QVBoxLayout,
     QWidget,
+    QTableWidgetItem
 )
+from PyQt6.QtCore import Qt
 from typing import override
 from core import Core
 
@@ -39,8 +41,11 @@ class TableUI(QWidget, Observer):
 
         # Table
         self.table = QTableWidget(self)
-        self.table.setRowCount(3)
-        self.table.setColumnCount(4)
+        self.table.setRowCount(0)
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderItem(0, QTableWidgetItem('Title'))
+        self.table.setHorizontalHeaderItem(1, QTableWidgetItem('Contents'))
+        self.table.horizontalHeader().setStretchLastSection(True)
         grouplayout.addWidget(self.table)
 
         # add buttons bottom of console
@@ -50,7 +55,15 @@ class TableUI(QWidget, Observer):
         self._core.attach(self)
 
     def update_table(self) -> None:
-        pass
+        self.table.setRowCount(0)
+        entries = self._core.database.get_all()
+        for index, entry in enumerate(entries):
+            self.table.insertRow(self.table.rowCount())
+            item = QTableWidgetItem(entry.contents[0:20])
+            item.setFlags(item.flags() ^ Qt.ItemFlag.ItemIsEditable)
+            self.table.setItem(self.table.rowCount()-1, 1, item)
+            item = QTableWidgetItem(str(index))
+            self.table.setVerticalHeaderItem(self.table.rowCount()-1, item)
 
     @override
     def update(self, message : str) -> None:
