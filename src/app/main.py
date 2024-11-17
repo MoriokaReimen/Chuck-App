@@ -9,10 +9,13 @@ from PyQt6.QtWidgets import (
     QMainWindow,
 )
 from qt_material import apply_stylesheet
+from core import Core
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self._core = Core.Core()
 
         # Confiture Window
         self.setWindowTitle("Chuck Norris")
@@ -23,18 +26,18 @@ class MainWindow(QMainWindow):
         self.widget.setLayout(pagelayout)
 
         # Configure Console UI
-        self.console_ui = ConsoleUI()
+        self.console_ui = ConsoleUI(self._core)
         pagelayout.addWidget(self.console_ui, 0, 0)
 
         # Configure StartStop UI
-        self.start_stop_ui = StartStopUI()
+        self.start_stop_ui = StartStopUI(self._core)
         pagelayout.addWidget(self.start_stop_ui, 1, 0)
 
         # tie whole widgets to Window
         self.setCentralWidget(self.widget)
 
     def __del__(self):
-        pass
+        self._core.stop()
 
 def main() -> None:
     app = QApplication(sys.argv)

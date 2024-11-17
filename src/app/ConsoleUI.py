@@ -10,12 +10,15 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import pyqtSignal
 import easygui
+from core import Core
 
 class ConsoleUI(QWidget, Observer):
     signal_append_console = pyqtSignal(str)
 
-    def __init__(self) -> None:
+    def __init__(self, core : Core) -> None:
         super().__init__()
+
+        self._core = core
 
         # Group Box
         groupbox = QGroupBox("Console")
@@ -51,6 +54,7 @@ class ConsoleUI(QWidget, Observer):
         grouplayout.addLayout(buttonlayout)
 
         # Attach to subject
+        self._core.attach(self)
         self.signal_append_console.connect(self.te_console.append)
 
     def save(self) -> None:
@@ -63,4 +67,5 @@ class ConsoleUI(QWidget, Observer):
         self.te_console.clear()
 
     def update(self, message : str) -> None:
-        self.signal_append_console.emit(message)
+        if "Heart Beat : " not in message:
+            self.signal_append_console.emit(message)
