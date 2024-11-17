@@ -2,6 +2,7 @@
 import sys
 from app.StartStopUI import StartStopUI
 from app.ConsoleUI import ConsoleUI
+from app.TableUI import TableUI
 from PyQt6.QtWidgets import (
     QGridLayout,
     QWidget,
@@ -27,7 +28,11 @@ class MainWindow(QMainWindow):
 
         # Configure Console UI
         self.console_ui = ConsoleUI(self._core)
-        pagelayout.addWidget(self.console_ui, 0, 0)
+        pagelayout.addWidget(self.console_ui, 0, 1)
+
+        # Configure Table UI
+        self.table_ui = TableUI(self._core)
+        pagelayout.addWidget(self.table_ui, 0, 0)
 
         # Configure StartStop UI
         self.start_stop_ui = StartStopUI(self._core)

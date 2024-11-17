@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import pyqtSignal
 import easygui
+from typing import override
 from core import Core
 
 class ConsoleUI(QWidget, Observer):
@@ -66,6 +67,7 @@ class ConsoleUI(QWidget, Observer):
     def clear(self) -> None:
         self.te_console.clear()
 
+    @override
     def update(self, message : str) -> None:
         if "Heart Beat : " not in message:
             self.signal_append_console.emit(message)
