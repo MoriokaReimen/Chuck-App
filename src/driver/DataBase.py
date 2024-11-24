@@ -1,11 +1,13 @@
-import sqlite3
 from dataclasses import dataclass, field
+from datetime import datetime
 import hashlib
+import sqlite3
 
 @dataclass
 class Entry:
     contents : str = ''
     attachments : list[str] = field(default_factory = list)
+    time_sent : datetime = datetime.now()
     title : str = ''
     sender : str = ''
     receiver : str = ''
@@ -34,6 +36,7 @@ class DataBase:
                 CREATE TABLE IF NOT EXISTS mail(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 hash TEXT NOT NULL UNIQUE,
+                time_sent INTEGER NOT NULL,
                 title TEXT NOT NULL,
                 sender TEXT NOT NULL,
                 receiver TEXT NOT NULL,
@@ -62,11 +65,12 @@ class DataBase:
         # If value is not exists in table add entry
         self._cur.execute(
         '''
-            INSERT INTO mail(hash, title, contents, sender, receiver)
-            VALUES (:hash, :title, :contents, :sender, :receiver)
+            INSERT INTO mail(hash, time_sent, title, contents, sender, receiver)
+            VALUES (:hash, :time_sent, :title, :contents, :sender, :receiver)
             RETURNING id
         ''', {'hash' : hash,
               'contents' : entry.contents,
+              'time_sent' : entry.time_sent.timestamp(),
               'title' : entry.title,
               'sender' : entry.sender,
               'receiver' : entry.receiver,
@@ -104,6 +108,7 @@ class DataBase:
         for mail in mails:
             entry = Entry()
             entry.contents = mail['contents']
+            entry.time_sent = datetime.fromtimestamp(mail['time_sent'])
             entry.title = mail['title']
             entry.sender = mail['sender']
             entry.receiver = mail['receiver']
